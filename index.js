@@ -9,7 +9,6 @@ var WunderlistSDK = require('wunderlist');
 var config = require('./config.json');
 
 function Finito(access_token) {
-    this.twentyFourHoursInMilisec = 24 * 60 * 60 * 1000;
     this.wunderlistApi = new WunderlistSDK({
         'accessToken': access_token,
         'clientID': config.wunderlist.key
@@ -31,6 +30,7 @@ Finito.prototype.getAllCompletedTasksFromLists = function(lists) {
     var tasks = [];
     var promises = _.map(lists, list => {
         return this.wunderlistApi.http.tasks.forList(list.id, true /* completed */).done(completedTasks => {
+            _.each(completedTasks, task => task['list_title'] = list.title);
             tasks.push(...completedTasks);
         }).fail(() => {
             console.log('Error getting tasks for list: ' + list.id);
@@ -43,15 +43,17 @@ Finito.prototype.getAllCompletedTasksFromLists = function(lists) {
     });
 }
 
-Finito.prototype.getCompletedInTheLastTwentyFourHours = function(tasks) {
+Finito.prototype.filterForCompletedInTheLastTwentyFourHours = function(tasks) {
     return _.filter(tasks, task => {
         var completedDate = new Date(task.completed_at);
-        var twentyFourHoursAgoTimeStamp = Date.now() - this.twentyFourHoursInMilisec;
+        var twentyFourHoursInMilisec = 24 * 60 * 60 * 1000;
+        var twentyFourHoursAgoTimeStamp = Date.now() - twentyFourHoursInMilisec;
         return completedDate.getTime() > twentyFourHoursAgoTimeStamp;
     });
 }
 
 var app = express();
+app.locals._ = require('lodash');
 app.set('view engine', 'pug');
 
 var grant = new Grant(require('./config.json'));
@@ -67,7 +69,7 @@ app.get('/wunderlistCallback', function (req, res) {
 
     finito.getAllLists().then(lists => {
         finito.getAllCompletedTasksFromLists(lists).then(tasks => {
-            res.render('tasklist', { title: 'Finito', tasks: finito.getCompletedInTheLastTwentyFourHours(tasks) });
+            res.render('tasklist', { title: 'Finito', tasks: _.sortBy(tasks, task => -1 * (new Date(task.completed_at)).getTime()) });
         });
     }).fail(() => {
         res.end('Something went wrong.');

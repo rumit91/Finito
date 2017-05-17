@@ -24,7 +24,7 @@ In order to run this node module you'll need to create a Grant configuration fil
   }
 }
 ```
-More info about Grant config files [here](https://github.com/simov/grant#configuration).
+More info about Grant config files [here](https://github.com/simov/grant#configuration) and a helpful [Grant guide here](https://scotch.io/tutorials/implement-oauth-into-your-express-koa-or-hapi-applications-using-grant).
 
 ## Deployment Notes
 ### Changing the Port Setting

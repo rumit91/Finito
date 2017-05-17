@@ -10,6 +10,7 @@
     "grant-express": "^3.7.2",
     "lodash": "^4.17.4",
     "pug": "^2.0.0-beta11",
+    "pug-bootstrap": "0.0.15",
     "request": "^2.81.0",
     "synctasks": "^0.2.17",
     "wunderlist": "^0.1.3"

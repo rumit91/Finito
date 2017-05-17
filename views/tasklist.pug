@@ -3,5 +3,7 @@ html
     title= title
   body
     ul
-    - for (var x = 0; x < tasks.length; x++)
-      li= tasks[x].title
+    - var groupedTasks = _.groupBy(tasks, task => (new Date(task.completed_at)).toLocaleDateString());
+    each dateTasks, dateGroup in groupedTasks
+      each task in dateTasks
+        li= dateGroup + ' ' + task.title
